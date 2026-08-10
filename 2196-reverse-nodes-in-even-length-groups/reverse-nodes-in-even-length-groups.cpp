@@ -10,65 +10,39 @@
  */
 class Solution {
 public:
-    ListNode* reverse(ListNode* head){
-        ListNode* next = head;
-        ListNode* curr = head;
-        ListNode* prev = NULL;
-        while(curr!=NULL){
-            next = curr->next;
-            curr->next = prev;  
-            prev = curr;
-            curr = next;  
-        }
-        return prev;
-
-    }
-     ListNode* reverseBetween(ListNode* head, int l, int r) {
-        if(left == right) return head;
-        int n=1;
-        ListNode* a = NULL;
-        ListNode* b = NULL;
-        ListNode* c = NULL;
-        ListNode* d = NULL;
-        ListNode* temp = head;
-        while(temp!=NULL){
-            if(n==(l-1)) a=temp;
-            if(n==l) b=temp;
-            if(n==r) c=temp;
-            if(n==(r+1)) d=temp;
-            n++;
-            temp = temp->next;
-        }
-        if(a)a->next = NULL;
-        if(c)c->next = NULL;
-        c = reverse(b);
-        if(a)a->next = c;
-        b->next = d;
-
-        if(a)return head;
-        return c;
-        
-    
-    }
     ListNode* reverseEvenLengthGroups(ListNode* head) {
-        ListNode* temp = head;
-        int gap = 1;
-        while(temp && temp->next){
-            int remlen =0;
-            ListNode* t = temp->next;
-            for(int i=1 ;i<=gap+1 && t!=NULL; i++){
-                t = t->next;
-                remlen++;
-            }
-            if(remlen < gap+1) gap = remlen-1;
-            if(gap%2!=0)reverseBetween(temp,2,2+gap);
-            gap++;
-            for(int i=1 ; temp!=NULL && i<=gap ; i++){
-                temp = temp->next;
-            }
-        }
-        
-        return head;
+       ListNode dummy(0, head);
+        ListNode *prev = &dummy;
+        ListNode *curr = head;
+        int elem = 1;
 
+       while(curr != nullptr){
+         int len = 0;
+         ListNode *count = curr;
+         while(len < elem && count != nullptr){
+            count = count->next;
+            len++;
+         }  
+         
+         int counter=1;
+         if(len % 2 == 0){
+           while(counter < len && curr->next != nullptr){
+            ListNode *temp = curr->next;
+            curr->next = temp->next;
+            temp->next =prev->next;
+            prev->next = temp;
+            counter++;
+           }
+         }else{   
+            while(counter < len && curr!=nullptr){
+                curr = curr->next;
+                counter++;
+            } 
+         }
+         prev = curr;
+         curr = curr->next;        
+         elem++;      
+       }
+       return dummy.next;
     }
 };
