@@ -1,31 +1,40 @@
 class MinStack {
 public:
-    stack<int> st;
-    stack<int> helper;
+    stack<long long> st;
+    long long min;
     MinStack() {
-
+        min = INT_MAX;
     }
     
     void push(int val) {// O(1)
-        st.push(val);
-        if(helper.size()==0 || val<helper.top()){
-            helper.push(val);  
+        long long x = (long long)val;
+        if(st.size()==0 ) {
+            st.push(x);
+            min = x;
         }
-        else helper.push(helper.top());
+        else if(x>=min) st.push(x);  
+        else {// val<min
+            st.push(2*x-min);
+            min = x;
+        }
         
     }
     
     void pop() { // O(1)
+        if(st.top()<min){// st.top() < min : fake value is present
+            // before popping retrive the old min
+            min = 2*min - st.top();
+        }
         st.pop();
-        helper.pop();
     }
     
     int top() { // O(1)
-        return st.top();
+        if(st.top()<min) return (int)min;
+        else return (int)(st.top());
     }
     
     int getMin() {
-        return helper.top();
+        return (int)min;
     }
 };
 
