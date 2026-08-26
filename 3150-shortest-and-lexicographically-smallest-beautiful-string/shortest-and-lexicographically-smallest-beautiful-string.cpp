@@ -2,29 +2,27 @@ class Solution {
 public:
     string shortestBeautifulSubstring(string s, int k) {
         int n = s.size();
-        vector<int> ones;
-        for (int i = 0; i < n; i++) {
-            if (s[i] == '1') ones.push_back(i);
-        }
+        int left = 0, count = 0;
+        int bestLen = INT_MAX, bestStart = -1;
 
-        int m = ones.size();
-        if (m < k) return "";
+        for (int right = 0; right < n; ++right) {
+            if (s[right] == '1') ++count;
 
-        int minLen = INT_MAX;
-        string result = "";
+            while (count == k) {
+                while (s[left] == '0') ++left;   // window must start at a '1'
 
-        for (int i = 0; i + k - 1 < m; i++) {
-            int start = ones[i];
-            int end = ones[i + k - 1];
-            int len = end - start + 1;
-            string candidate = s.substr(start, len);
+                int len = right - left + 1;
+                if (len < bestLen ||
+                    (len == bestLen && s.compare(left, len, s, bestStart, len) < 0)) {
+                    bestLen = len;
+                    bestStart = left;
+                }
 
-            if (len < minLen || (len == minLen && candidate < result)) {
-                minLen = len;
-                result = candidate;
+                --count;   // drop the leading '1', look for the next window
+                ++left;
             }
         }
 
-        return result;
+        return bestStart == -1 ? "" : s.substr(bestStart, bestLen);
     }
 };
