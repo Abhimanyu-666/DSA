@@ -10,21 +10,19 @@
  * };
  */
 class Solution {
-    public:
-    int ans=0;
-
-    int depth(TreeNode* root){
-        if(!root)return 0;
-
-        int lh=depth(root->left);
-        int rh=depth(root->right);
-
-        ans=max(ans,lh+rh);
-        return max(lh,rh)+1;
+public:
+    int MaxDia = 0;
+    int levels(TreeNode* root){
+        if(root==NULL) return 0;
+        return 1 + max(levels(root->left) , levels(root->right));
     }
-
     int diameterOfBinaryTree(TreeNode* root) {
-        depth(root);
-        return ans;
+        if(root==NULL) return 0;
+        int dia = levels(root->left) + levels(root->right);
+        MaxDia = max(dia,MaxDia);
+
+        diameterOfBinaryTree(root->left);
+        diameterOfBinaryTree(root->right);
+        return MaxDia;
     }
 };
