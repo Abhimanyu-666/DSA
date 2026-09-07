@@ -1,7 +1,6 @@
 class Solution {
 public:
-    vector<vector<int>> ans;
-    vector<int> path;
+    
 
     void helper(TreeNode* root, int remaining,vector<vector<int>>& ans,vector<int> path) {
         if (root == NULL)return;
