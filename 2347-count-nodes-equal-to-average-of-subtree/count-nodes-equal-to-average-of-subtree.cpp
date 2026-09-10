@@ -1,40 +1,30 @@
-/**
- * Definition for a binary tree node.
- * struct TreeNode {
- *     int val;
- *     TreeNode *left;
- *     TreeNode *right;
- *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
- *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
- *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
- * };
- */
 class Solution {
 public:
-    int ans = 0;
-
-    void dfs(TreeNode* root, int &sum, int &count){
-        if(root == NULL){ 
-            sum = 0; 
-            count = 0; 
-            return; 
+    int count = 0;
+    
+    pair<int, int> postOrder(TreeNode* root) {
+        if (root == NULL) {
+            return {0, 0};
         }
+        
+        // First iterate over left and right subtrees.
+        pair<int, int> left = postOrder(root->left);
+        pair<int, int> right = postOrder(root->right);
+        
+        int nodeSum = left.first + right.first + root->val;
+        int nodeCount = left.second + right.second + 1;
 
-        int leftSum = 0, leftCount = 0;
-        int rightSum = 0, rightCount = 0;
-
-        dfs(root->left, leftSum, leftCount);
-        dfs(root->right, rightSum, rightCount);
-
-        sum = leftSum + rightSum + root->val;
-        count = leftCount + rightCount + 1;
-
-        if (sum/count == root->val) ans++;
+        // Check if the average of the subtree is equal to the node value.
+        if (root->val == nodeSum / (nodeCount)) {
+            count++;
+        }
+        
+        // Return the sum of nodes and the count in the subtree.
+        return {nodeSum, nodeCount};
     }
-
+    
     int averageOfSubtree(TreeNode* root) {
-        int sum = 0, count = 0;
-        dfs(root, sum, count);
-        return ans;
+        postOrder(root);
+        return count;
     }
 };
