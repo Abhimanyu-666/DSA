@@ -1,24 +1,21 @@
 class Solution {
 public:
     int totalNumbers(vector<int>& digits) {
-        int cnt[10] = {0};
-        for (int d : digits) cnt[d]++;
+        set<int> valid;
+        int n = digits.size();
 
-        int count = 0;
-        for (int num = 100; num < 1000; num += 2) {
-            int need[10] = {0};
-            int temp = num;
-            for (int i = 0; i < 3; i++) {
-                need[temp % 10]++;
-                temp /= 10;
-            }
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                for (int k = 0; k < n; k++) {
+                    if (i == k || j == k || i == j) continue;
+                    if (digits[i] == 0) continue;       // no leading zero
+                    if (digits[k] % 2 != 0) continue;   // last digit must be even
 
-            bool ok = true;
-            for (int i = 0; i < 10; i++) {
-                if (need[i] > cnt[i]) { ok = false; break; }
+                    int num = digits[i]*100 + digits[j]*10 + digits[k];
+                    valid.insert(num);
+                }
             }
-            if (ok) count++;
         }
-        return count;
+        return valid.size();
     }
 };
