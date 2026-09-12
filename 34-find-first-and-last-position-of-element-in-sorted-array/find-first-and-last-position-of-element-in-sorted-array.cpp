@@ -1,37 +1,23 @@
 class Solution {
 public:
+    int lowerBound(vector<int>& arr, int x){
+        int lo = 0, hi = arr.size();  // note: hi = size(), not size()-1
+        while(lo < hi){
+            int mid = lo + (hi-lo)/2;
+            if(arr[mid] < x) lo = mid+1;
+            else hi = mid;
+        }
+        return lo; // first index with arr[index] >= x (== size() if none)
+    }
+
     vector<int> searchRange(vector<int>& arr, int target) {
-        vector<int> ans(2, -1);
         int n = arr.size();
-        int lo = 0, hi = n - 1;
+        int first = lowerBound(arr, target);
 
-        while (lo <= hi) { // first position
-            int mid = lo + (hi - lo) / 2;
-            if (arr[mid] == target) {
-                if (mid == 0 || arr[mid - 1] != target) {
-                    ans[0] = mid;
-                    break;
-                }
-                else hi = mid - 1;
-            }
-            else if (arr[mid] < target) lo = mid + 1;
-            else hi = mid - 1;
-        }
+        if(first == n || arr[first] != target) 
+            return {-1, -1}; // target doesn't exist at all
 
-        lo = 0; hi = n - 1;
-        while (lo <= hi) { // last position
-            int mid = lo + (hi - lo) / 2;
-            if (arr[mid] == target) {
-                if (mid == n - 1 || arr[mid + 1] != target) {
-                    ans[1] = mid;
-                    break;
-                }
-                else lo = mid + 1;
-            }
-            else if (arr[mid] < target) lo = mid + 1;
-            else hi = mid - 1;
-        }
-
-        return ans;
+        int last = lowerBound(arr, target+1) - 1;
+        return {first, last};
     }
 };
