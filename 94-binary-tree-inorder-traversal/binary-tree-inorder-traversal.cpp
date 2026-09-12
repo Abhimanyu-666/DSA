@@ -1,31 +1,30 @@
-/**
- * Definition for a binary tree node.
- * struct TreeNode {
- *     int val;
- *     TreeNode *left;
- *     TreeNode *right;
- *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
- *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
- *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
- * };
- */
 class Solution {
 public:
-    vector<int> inorderTraversal(TreeNode* root) {
-        stack<TreeNode*> st;
-        vector<int> ans;
-        TreeNode* node = root;
-        while(st.size()>0 || node){
-            if(node){
-                st.push(node);
-                node = node->left;
-            }
-            else{// node is null
-                TreeNode* temp = st.top();
-                st.pop();
+    // Morris traversal
 
-                ans.push_back(temp->val);
-                node = temp->right;
+    vector<int> inorderTraversal(TreeNode* root) {
+        vector<int> ans;
+        TreeNode* curr = root;
+        TreeNode* pred;
+        while(curr!=NULL){
+            if(curr->left != NULL){ // find predecessor
+                pred = curr->left;
+                while(pred->right!=NULL && pred->right!=curr){
+                    pred = pred->right;
+                }
+                if(pred->right == NULL){// link pred to curr and move cuur to the left
+                    pred->right = curr;
+                    curr = curr->left;
+                }
+                if(pred->right == curr){// unlink
+                    pred->right = NULL;
+                    ans.push_back(curr->val);
+                    curr = curr->right;
+                }
+            }
+            else{
+                ans.push_back(curr->val);
+                curr = curr->right;
             }
         }
         return ans;
