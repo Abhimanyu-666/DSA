@@ -12,12 +12,12 @@ public:
         while(x<=y){
             if(isPerfectSquare(x) && isPerfectSquare(y)) return true;
             else if(!isPerfectSquare(y)){
-                y = ((int)sqrt(y)) * ((int)sqrt(y));
-                x = c - y;
+                y = ((int)sqrt(y)) * ((int)sqrt(y));// make it the previous perfect square
+                x = c - y;  // x + y = c
             }
             else{
-                x = ((int)sqrt(x)+1) * ((int)sqrt(x)+1);
-                y = c - x;
+                x = ((int)sqrt(x)+1) * ((int)sqrt(x)+1);// make it the next perfect square
+                y = c - x;  // x + y = c
             }
         }
         return false;
