@@ -1,58 +1,61 @@
 class Solution {
 public:
-    string expr;
-    int idx = 0;
+    string s;
+    int i = 0;
 
-    // Parses a single letter OR a {...} group, returns its set of words
-    set<string> parseFactor() {
-        if (expr[idx] == '{') {
-            idx++; // consume '{'
-            set<string> result = parseExpr();
-            idx++; // consume '}'
-            return result;
-        } else {
-            // single lowercase letter
-            string s(1, expr[idx]);
-            idx++;
-            return {s};
+    vector<string> parseExpr() {
+        vector<string> res = parseTerm();
+        while (i < (int)s.size() && s[i] == ',') {
+            i++; // consume ','
+            vector<string> term = parseTerm();
+            res.insert(res.end(), 
+                       make_move_iterator(term.begin()), 
+                       make_move_iterator(term.end()));
         }
+        return res;
     }
 
-    // Parses concatenation of factors (cartesian product), 
-    // stops at ',' or '}' or end of string
-    set<string> parseTerm() {
-        set<string> result = {""}; // start with empty string as identity for concat
+    vector<string> parseTerm() {
+        vector<string> res = {""}; // identity element for concatenation
 
-        while (idx < (int)expr.size() && expr[idx] != ',' && expr[idx] != '}') {
-            set<string> factorSet = parseFactor();
-            set<string> newResult;
-            for (const string& a : result) {
-                for (const string& b : factorSet) {
-                    newResult.insert(a + b);
-                }
+        while (i < (int)s.size() && s[i] != ',' && s[i] != '}') {
+            vector<string> factor = parseFactor();
+
+            // fast path: skip cartesian product entirely if res is just {""}
+            if (res.size() == 1 && res[0].empty()) {
+                res = move(factor);
+                continue;
             }
-            result = newResult;
+
+            vector<string> merged;
+            merged.reserve(res.size() * factor.size());
+            for (const string& a : res)
+                for (const string& b : factor)
+                    merged.push_back(a + b);
+            res = move(merged);
         }
-        return result;
+        return res;
     }
 
-    // Parses comma-separated terms (union), stops at '}' or end of string
-    set<string> parseExpr() {
-        set<string> result;
-        result = parseTerm(); // first term
-
-        while (idx < (int)expr.size() && expr[idx] == ',') {
-            idx++; // consume ','
-            set<string> termSet = parseTerm();
-            result.insert(termSet.begin(), termSet.end());
+    vector<string> parseFactor() {
+        if (s[i] == '{') {
+            i++; // consume '{'
+            vector<string> res = parseExpr();
+            i++; // consume '}'
+            return res;
         }
-        return result;
+        // greedily consume a run of consecutive letters as ONE literal factor
+        int start = i;
+        while (i < (int)s.size() && islower(s[i])) i++;
+        return { s.substr(start, i - start) };
     }
 
     vector<string> braceExpansionII(string expression) {
-        expr = expression;
-        idx = 0;
-        set<string> resultSet = parseExpr();
-        return vector<string>(resultSet.begin(), resultSet.end());
+        s = move(expression);
+        i = 0;
+        vector<string> result = parseExpr();
+        sort(result.begin(), result.end());
+        result.erase(unique(result.begin(), result.end()), result.end());
+        return result;
     }
 };
