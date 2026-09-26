@@ -1,31 +1,30 @@
 class Solution {
 public:
     string evaluate(string s, vector<vector<string>>& knowledge) {
-        unordered_map<string, string> mp;
+        unordered_map<string_view, string_view> mp;
+        mp.reserve(knowledge.size());
         for (auto& kv : knowledge) {
-            mp[kv[0]] = kv[1];
+            mp.emplace(string_view(kv[0]), string_view(kv[1]));
         }
 
         string result;
-        result.reserve(s.size()); // rough estimate, avoids reallocations
+        result.reserve(s.size());
 
         int n = s.size();
         int i = 0;
         while (i < n) {
-            if (s[i] == '(') {
+            char c = s[i];
+            if (c == '(') {
                 int j = i + 1;
                 while (s[j] != ')') j++;
-                string key = s.substr(i + 1, j - i - 1);
 
+                string_view key(s.data() + i + 1, j - i - 1);
                 auto it = mp.find(key);
-                if (it != mp.end()) {
-                    result += it->second;
-                } else {
-                    result += '?';
-                }
-                i = j + 1; // move past ')'
+                result += (it != mp.end()) ? it->second : string_view("?");
+
+                i = j + 1;
             } else {
-                result += s[i];
+                result += c;
                 i++;
             }
         }
