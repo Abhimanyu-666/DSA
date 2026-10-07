@@ -1,44 +1,45 @@
 class Solution {
 public:
+    void bfs(int row, int col,vector<vector<char>>& grid, vector<vector<int>>& vis){
+        vis[row][col] = 1;
+        int n = grid.size();
+        int m = grid[0].size();
+        queue<pair<int,int>> q;
+        q.push({row,col});
+        while(q.size()>0){
+            int row = q.front().first;
+            int col = q.front().second;
+            q.pop();
+
+            int drow[] = {-1,0,1,0};
+            int dcol[] = {0,1,0,-1};
+            for(int i=0 ; i<4 ; i++){
+                int nrow = row + drow[i];
+                int ncol = col + dcol[i];
+                if(nrow>=0 && nrow<n && ncol>=0 && ncol<m &&
+                   !vis[nrow][ncol] && grid[nrow][ncol]=='1'){
+                        vis[nrow][ncol]=1;
+                        q.push({nrow,ncol});
+                   }
+            }
+
+        }
+    }
     int numIslands(vector<vector<char>>& grid) {
         int n = grid.size();
-        if (n == 0) return 0;
         int m = grid[0].size();
-        int cnt = 0;
 
-        static const int drow[] = {-1, 1, 0, 0};
-        static const int dcol[] = {0, 0, -1, 1};
+        vector<vector<int>> vis(n,vector<int>(m,0));
+        int count = 0;
 
-        vector<int> stack; // encode row*m + col
-        stack.reserve(n * m);
-
-        for (int row = 0; row < n; row++) {
-            for (int col = 0; col < m; col++) {
-                if (grid[row][col] != '1') continue;
-                cnt++;
-
-                // iterative DFS using grid itself as visited marker
-                grid[row][col] = '0';
-                stack.push_back(row * m + col);
-
-                while (!stack.empty()) {
-                    int code = stack.back();
-                    stack.pop_back();
-                    int r = code / m;
-                    int c = code % m;
-
-                    for (int i = 0; i < 4; i++) {
-                        int nr = r + drow[i];
-                        int nc = c + dcol[i];
-                        if (nr >= 0 && nr < n && nc >= 0 && nc < m &&
-                            grid[nr][nc] == '1') {
-                            grid[nr][nc] = '0';
-                            stack.push_back(nr * m + nc);
-                        }
-                    }
+        for(int i=0 ; i<n ; i++){
+            for(int j=0 ; j<m ; j++){
+                if(!vis[i][j] && grid[i][j]=='1'){
+                    count++;
+                    bfs(i,j,grid,vis);
                 }
             }
         }
-        return cnt;
+        return count;
     }
 };
