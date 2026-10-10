@@ -1,53 +1,38 @@
 class Solution {
 public:
     int numEnclaves(vector<vector<int>>& grid) {
-        int n = grid.size();
-        int m = grid[0].size();
+        int n = grid.size(), m = grid[0].size();
 
-        vector<vector<int>> vis(n,vector<int> (m,0));
-        queue<pair<int,int>> q;
+        int land = 0;
+        for (auto& row : grid)
+            for (int x : row) land += x;
 
-        for(int i=0 ; i<n ; i++){
-            for(int j=0 ; j<m ; j++){
-                // first row , last row , first column , last column
-                if(i==0 || j==0 || i==(n-1) || j==(m-1)){
-                    if(grid[i][j]==1){
-                        q.push({i,j});
-                        vis[i][j]=1;
-                    }
-                }
+        vector<pair<int, int>> st;
+        auto push = [&](int r, int c) {
+            if (grid[r][c] == 1) {
+                grid[r][c] = 0;   // sink it (visited)
+                land--;           // it can escape, so not an enclave
+                st.push_back({r, c});
+            }
+        };
+
+        // seed only from border land cells (O(n + m), not O(n*m))
+        for (int i = 0; i < n; i++) { push(i, 0); push(i, m - 1); }
+        for (int j = 0; j < m; j++) { push(0, j); push(n - 1, j); }
+
+        int dr[] = {-1, 1, 0, 0};
+        int dc[] = {0, 0, 1, -1};
+
+        while (!st.empty()) {
+            auto [r, c] = st.back();
+            st.pop_back();
+            for (int d = 0; d < 4; d++) {
+                int nr = r + dr[d], nc = c + dc[d];
+                if (nr >= 0 && nr < n && nc >= 0 && nc < m)
+                    push(nr, nc);
             }
         }
 
-        int delrow[] = {-1,1,0,0};
-        int delcol[] = {0,0,1,-1};
-        //BFS
-        while(!q.empty()){
-            int row = q.front().first;
-            int col = q.front().second;
-            q.pop();
-
-            for(int i=0 ; i<4 ; i++){
-                int nrow = row + delrow[i];
-                int ncol = col + delcol[i];
-
-                if(nrow>=0 && nrow<n && ncol>=0 && ncol<m &&
-                   !vis[nrow][ncol] && grid[nrow][ncol]==1){
-                        q.push({nrow,ncol});
-                        vis[nrow][ncol]=1;
-                   }
-
-            }
-        }
-        int count=0;
-        for(int i=0 ; i<n ; i++){
-            for(int j=0 ; j<m ; j++){
-                if(grid[i][j]==1 && !vis[i][j]){
-                    count++;
-                }
-            }
-        }
-        
-        return count;
+        return land;
     }
 };
